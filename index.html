@@ -37,6 +37,27 @@
     max-width: 560px;
     margin: 0 auto;
   }
+  .sprachleiste {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    justify-content: center;
+    margin: 0 0 20px;
+  }
+  .sprachleiste button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 0.82rem;
+    cursor: pointer;
+    padding: 2px 2px;
+    font-family: inherit;
+  }
+  .sprachleiste button.aktiv {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: underline;
+  }
   .card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -76,27 +97,99 @@
     font-size: 0.82rem;
     color: var(--muted);
   }
+  [dir="rtl"] { text-align: right; }
 </style>
 </head>
 <body>
 <main>
+  <nav class="sprachleiste" id="sprachleiste"></nav>
   <div class="card">
-    <h1>Impressum</h1>
-    <p class="untertitel">für die App <span class="app-name">Coasts &amp; Cliffs</span></p>
+    <h1 id="txt-titel">Impressum</h1>
+    <p class="untertitel"><span id="txt-untertitel">für die App</span> <span class="app-name">Coasts &amp; Cliffs</span></p>
 
-    <h2>Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG)</h2>
+    <h2 id="txt-abschnitt-gesetz">Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG)</h2>
     <p>Lukas Döhring</p>
 
-    <h2>Kontakt</h2>
+    <h2 id="txt-abschnitt-kontakt">Kontakt</h2>
     <p>E-Mail: <a href="mailto:lifjak2026@gmail.com">lifjak2026@gmail.com</a></p>
 
-    <h2>Verantwortlich für den Inhalt</h2>
-    <p>Lukas Döhring (Kontakt siehe oben)</p>
+    <h2 id="txt-abschnitt-verantwortlich">Verantwortlich für den Inhalt</h2>
+    <p>Lukas Döhring (<span id="txt-kontakt-siehe-oben">Kontakt siehe oben</span>)</p>
 
-    <p class="hinweis">
+    <p class="hinweis" id="txt-hinweis">
       Diese Seite ist eine Vorlage und ersetzt keine Rechtsberatung. Bitte im Zweifel rechtlich prüfen lassen.
     </p>
   </div>
 </main>
+<script>
+  // Alle Texte je Sprachcode - dieselben Formulierungen wie in der
+  // App selbst (Einstellungen/Datenschutz), damit App und diese externe
+  // Seite konsistent klingen. "eigenname" ist der Name der Sprache in
+  // sich selbst, fuer die Sprachleiste oben.
+  var TEXTE = {
+    de: { eigenname: 'Deutsch', titel: 'Impressum', untertitel: 'für die App', gesetz: 'Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG)', kontakt: 'Kontakt', verantwortlich: 'Verantwortlich für den Inhalt', siehe_oben: 'Kontakt siehe oben', hinweis: 'Diese Seite ist eine Vorlage und ersetzt keine Rechtsberatung. Bitte im Zweifel rechtlich prüfen lassen.' },
+    en: { eigenname: 'English', titel: 'Legal Notice', untertitel: 'for the app', gesetz: 'Information according to § 5 German Digital Services Act (DDG)', kontakt: 'Contact', verantwortlich: 'Responsible for content', siehe_oben: 'contact see above', hinweis: 'This page is a template and does not replace legal advice. If in doubt, please have it reviewed.', dir: 'ltr' },
+    es: { eigenname: 'Español', titel: 'Aviso legal', untertitel: 'para la app', gesetz: 'Información conforme al § 5 de la Ley alemana de Servicios Digitales (DDG)', kontakt: 'Contacto', verantwortlich: 'Responsable del contenido', siehe_oben: 'contacto arriba', hinweis: 'Esta página es una plantilla y no sustituye el asesoramiento legal. En caso de duda, consúltalo con un profesional.' },
+    fr: { eigenname: 'Français', titel: 'Mentions légales', untertitel: "pour l'application", gesetz: "Informations conformément à l'article 5 de la loi allemande sur les services numériques (DDG)", kontakt: 'Contact', verantwortlich: 'Responsable du contenu', siehe_oben: 'contact ci-dessus', hinweis: 'Cette page est un modèle et ne remplace pas un conseil juridique. En cas de doute, fais-la vérifier.' },
+    ru: { eigenname: 'Русский', titel: 'Выходные данные', untertitel: 'для приложения', gesetz: 'Сведения согласно § 5 немецкого Закона о цифровых услугах (DDG)', kontakt: 'Контакт', verantwortlich: 'Ответственный за содержание', siehe_oben: 'контакт см. выше', hinweis: 'Эта страница — шаблон и не заменяет юридическую консультацию. В случае сомнений проверь её у специалиста.' },
+    zh: { eigenname: '中文', titel: '版本信息', untertitel: '适用于应用', gesetz: '根据《德国数字服务法》(DDG) 第5条提供的信息', kontakt: '联系方式', verantwortlich: '内容责任人', siehe_oben: '联系方式见上', hinweis: '本页面为模板，不能替代法律咨询。如有疑问，请寻求专业法律审核。' },
+    pt: { eigenname: 'Português', titel: 'Aviso legal', untertitel: 'para o aplicativo', gesetz: 'Informações conforme o § 5 da Lei alemã de Serviços Digitais (DDG)', kontakt: 'Contato', verantwortlich: 'Responsável pelo conteúdo', siehe_oben: 'contato acima', hinweis: 'Esta página é um modelo e não substitui uma consulta jurídica. Em caso de dúvida, procure uma revisão profissional.' },
+    ar: { eigenname: 'العربية', titel: 'بيانات الناشر', untertitel: 'لتطبيق', gesetz: 'بيانات وفقًا للمادة 5 من قانون الخدمات الرقمية الألماني (DDG)', kontakt: 'التواصل', verantwortlich: 'المسؤول عن المحتوى', siehe_oben: 'التواصل أعلاه', hinweis: 'هذه الصفحة نموذج ولا تغني عن الاستشارة القانونية. عند الشك، يرجى مراجعتها قانونيًا.', dir: 'rtl' },
+    hi: { eigenname: 'हिन्दी', titel: 'इंप्रेसम', untertitel: 'ऐप के लिए', gesetz: 'जर्मन डिजिटल सेवा अधिनियम (DDG) की धारा 5 के अनुसार जानकारी', kontakt: 'संपर्क', verantwortlich: 'सामग्री के लिए जिम्मेदार', siehe_oben: 'संपर्क ऊपर देखें', hinweis: 'यह पृष्ठ एक टेम्पलेट है और कानूनी सलाह का विकल्प नहीं है। संदेह होने पर कृपया इसकी कानूनी जाँच करवाएँ।' },
+    ja: { eigenname: '日本語', titel: '運営者情報', untertitel: 'アプリの', gesetz: 'ドイツ・デジタルサービス法（DDG）第5条に基づく表示', kontakt: '連絡先', verantwortlich: 'コンテンツ責任者', siehe_oben: '連絡先は上記参照', hinweis: 'このページはテンプレートであり、法的助言に代わるものではありません。不安な場合は専門家に確認してください。' },
+    it: { eigenname: 'Italiano', titel: 'Note legali', untertitel: "per l'app", gesetz: 'Informazioni ai sensi del § 5 della legge tedesca sui servizi digitali (DDG)', kontakt: 'Contatto', verantwortlich: 'Responsabile del contenuto', siehe_oben: 'contatto sopra', hinweis: 'Questa pagina è un modello e non sostituisce una consulenza legale. In caso di dubbio, fatti assistere da un professionista.' }
+  };
+  var REIHENFOLGE = ['de','en','es','fr','ru','zh','pt','ar','hi','ja','it'];
+
+  function sprachAnwenden(code) {
+    var t = TEXTE[code] || TEXTE.de;
+    document.documentElement.lang = code;
+    document.documentElement.dir = t.dir === 'rtl' ? 'rtl' : 'ltr';
+    document.getElementById('txt-titel').textContent = t.titel;
+    document.getElementById('txt-untertitel').textContent = t.untertitel;
+    document.getElementById('txt-abschnitt-gesetz').textContent = t.gesetz;
+    document.getElementById('txt-abschnitt-kontakt').textContent = t.kontakt;
+    document.getElementById('txt-abschnitt-verantwortlich').textContent = t.verantwortlich;
+    document.getElementById('txt-kontakt-siehe-oben').textContent = t.siehe_oben;
+    document.getElementById('txt-hinweis').textContent = t.hinweis;
+    document.title = t.titel + ' – Coasts & Cliffs';
+    var knoepfe = document.querySelectorAll('.sprachleiste button');
+    for (var i = 0; i < knoepfe.length; i++) {
+      knoepfe[i].classList.toggle('aktiv', knoepfe[i].dataset.code === code);
+    }
+    try { localStorage.setItem('sprache', code); } catch (e) {}
+  }
+
+  function sprachleisteAufbauen() {
+    var leiste = document.getElementById('sprachleiste');
+    REIHENFOLGE.forEach(function (code, i) {
+      var knopf = document.createElement('button');
+      knopf.type = 'button';
+      knopf.dataset.code = code;
+      knopf.textContent = TEXTE[code].eigenname;
+      knopf.addEventListener('click', function () { sprachAnwenden(code); });
+      leiste.appendChild(knopf);
+      if (i < REIHENFOLGE.length - 1) {
+        leiste.appendChild(document.createTextNode('·'));
+      }
+    });
+  }
+
+  function anfangsspracheErmitteln() {
+    try {
+      var gespeichert = localStorage.getItem('sprache');
+      if (gespeichert && TEXTE[gespeichert]) return gespeichert;
+    } catch (e) {}
+    var browserSprachen = navigator.languages || [navigator.language || 'de'];
+    for (var i = 0; i < browserSprachen.length; i++) {
+      var kurz = browserSprachen[i].slice(0, 2).toLowerCase();
+      if (TEXTE[kurz]) return kurz;
+    }
+    return 'de';
+  }
+
+  sprachleisteAufbauen();
+  sprachAnwenden(anfangsspracheErmitteln());
+</script>
 </body>
 </html>
